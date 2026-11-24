@@ -17,3 +17,6 @@ Read root AGENTS.md, docs/CURRENT_WORK.md, docs/REFERENCE_TO_MODEL_METHOD.md and
 
 ## Evidence and thresholds
 See docs/QA_BARRAMUNDI_RGB_RECONSTRUCTION.md (99.1778% fresh-angle IoU, ~0.69 mm average surface deviation, dense mesh) and docs/QA_LOCOMOTIVE_CONCEPT_MODEL.md (parametric 36640-triangle assembly, owner judged usable). These are benchmark observations, not universal acceptance thresholds. Define tolerances by project and scale. Do not deliver unapproved blockouts as finished work. A qualitative owner approval of the example does not prove exact fidelity or native game readiness.
+
+## Reusable accepted V3 source
+For locomotive-style mechanical models, read experiments/locomotive-v3/README.md and baseline/qa.json, inspect the archived build.py and verify.py, and use the separate rebuild wrapper in an isolated directory. Do not change accepted V3 inputs or replace exact original GLBs with differing builds. Preserve roof-mounted components on the actual supporting surface and validate normals, closure where applicable, stable bounds and named moving parts after smoothing. V3 is a visual benchmark, not a general threshold or in-game approval.
