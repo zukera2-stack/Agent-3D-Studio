@@ -27,3 +27,16 @@ Demo GLB can be opened in compatible 3D viewers. It is a geometry test fixture, 
 Stage 01 does not implement silhouette fitting, UV/texturing, mesh self-intersection tests, rendering, Factorio sprites or game testing. See docs/ARCHITECTURE.md and docs/STAGE01_ACCEPTANCE.md.
 
 All development on feature/stage-01-geometry-kernel via Draft PR. The new repository main was initialized with ONLY the initial README; no merge without owner permission. Factorio and user art remain untouched.
+
+## Stage 02: native camera and image generator (experimental)
+The Stage 02 branch adds a pure-Python orthographic/perspective camera, near/far clipping, CPU Z-buffer renderer, deterministic PNG encoder, real-source silhouette masks, four one-way SVG grid sheets and explicit manual-landmark 2D registration.
+
+Run in repository root:
+
+    python -m unittest discover -s tests -v
+    python -m a3ds demo --out stage01.glb --project stage01.a3ds.json
+    python -m a3ds.stage02_cli --glb stage01.glb --out-dir out/stage02 --width 480 --height 360
+
+The output folder contains four orthographic color PNG and 0.1 BU SVG grid sheets, a perspective hero PNG, five silhouette masks and report.json. All raster pixels come from the real 3D mesh. The Stage 01 original demo is a technical shape test; it is not approved game art.
+
+See docs/CAMERA_COORDINATES.md and docs/STAGE02_ACCEPTANCE.md. Stage 02 is a stacked Draft PR, not yet merged into main.
