@@ -44,3 +44,6 @@
 - Barramundi_overlay_QA.zip SHA256 d2771e80da405253e4aaaf7743abdb82a7a43ff43ace75e99604d6fca3a6fd31. fish_overlay/compare.py, metrics.json, run.log; требует обе точные GLB, см. QA Barramundi.
 - Locomotive_source_QA.zip SHA256 aea206a999a499906f5341e6ebf7cb780de365b81c613291bc7c10b5221f4fdc. loco_qa/build.py, README.md, метрики, журнал, PNG и GLB. Из изолированного каталога запуск python build.py (пишет GLB уровнем выше, PNG рядом со скриптом).
 - Это исторические автономные скрипты, не штатная команда A3DS. Не объявлять, что интеграция или повторное исполнение были проведены при записи методики.
+
+## Accepted mechanical benchmark: Locomotive V3
+Use [archived V3 source and QA](../experiments/locomotive-v3/README.md) as the tested practical benchmark for curved mechanical assets. Preserve the corrected hatch footprints; resample curved surfaces with PCHIP and explicit normals, keep hard edges, maintain common axes and separate moving components. Verify global bounds and sampled support after changing curvature. Owner approved V3 visually; archive baseline has 515 named meshes, 233928 triangles and a 4096x2048 texture, intended for offline sprite rendering. Exact original asset hashes are in accepted-assets.sha256; a rebuild must not be assumed bit-identical. No production integration or native game verification.
