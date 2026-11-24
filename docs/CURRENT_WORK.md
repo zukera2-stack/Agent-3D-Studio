@@ -26,3 +26,14 @@ Next: assess actual CI on the exact Stage 03 code SHA, fix any failures in Stage
 - 3.12 artifact: https://github.com/zukera2-stack/Agent-3D-Studio/actions/runs/45441334462/artifacts/14944305586
 - Local in-chat Python tooling still returns ClientError; this was ACTUAL cloud-runner Python, not local execution.
 - Still NOT_RUN: any fitting against the original owner locomotive sketch, independently established camera calibration of that sketch, human visual quality approval, Factorio game tests.
+
+
+## Stage 04A / 04B — development freeze and QA (2026-11-24)
+Owner instruction: STOP at Stage 04B; only verification and documentation, no Stage 05, no merge/release, no Factorio changes.
+- Stage 04A PR #4: code/docs HEAD ecf9360d5f88c49dcc43601f886b5ee69f0cc177; three CI workflows completed successfully.
+- Stage 04B PR #5: tested production-code HEAD 83301f434d6a63ca2c44a8cf93098262efbcf2a2.
+- Read actual logs for six jobs. Geometry QA [45446845235](https://github.com/zukera2-stack/Agent-3D-Studio/actions/runs/45446845235) and Native Rendering QA [45446845280](https://github.com/zukera2-stack/Agent-3D-Studio/actions/runs/45446845280): Python 3.11 and 3.12 each ran 81 tests, OK (skipped=1). Stage 03 full QA [45446845303](https://github.com/zukera2-stack/Agent-3D-Studio/actions/runs/45446845303): both interpreters ran 81 tests, OK, no skips. Jobs 138632848617 and 138632848993.
+- All nine Stage 04A/B tests PASS in all six jobs: valid/invalid edits, orbit render and bounds, side center and front width coordinate signs, shared history, atomic rejection, front handle identity.
+- Independent local environment: Python 3.13.5, Tk 8.6, Xvfb present. Attempted exact branch clone with GIT_TERMINAL_PROMPT=0; failed: Could not resolve host: github.com. No local source execution claimed.
+- Added QA-only tests/gui_stage04b_smoke.py and .github/workflows/stage04b-gui-qa.yml at 8dc284089884a5c9cdec06d3bb67e5ba67046d89. Actual Tk/Xvfb event smoke test is pending; no successful execution yet observed. Dialog paths mocked for isolated testing, not a native Windows or human acceptance test.
+- Remaining NOT_RUN: Windows GUI, independent visual inspection, overlay registration and transparency, arbitrary model framing, performance, actual owner locomotive sketch, game integration. Current GUI is a single-loft editor and redraws after release. No new modeling features authorized.
