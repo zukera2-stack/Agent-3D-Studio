@@ -1,21 +1,21 @@
 name: Locomotive V3 archive reproduction
 on:
-  pull_request:
-    paths:
-      - 'experiments/locomotive-v3/**'
-      - '.github/workflows/locomotive-v3-archive.yml'
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 jobs:
   rebuild:
-    if: github.event_name == 'workflow_dispatch' || (github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'feature/stage-04b-linked-views')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          ref: ${{ github.sha }}
           persist-credentials: false
       - uses: actions/setup-python@v5
         with:
@@ -43,48 +43,3 @@ jobs:
             experiments/locomotive-v3/loco_v3/metrics.json
             experiments/locomotive-v3/loco_v3/qa.json
             experiments/locomotive-v3/rebuild_hashes.json
-  preserve-exact:
-    needs: rebuild
-    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'feature/stage-04b-linked-views'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-      - uses: actions/download-artifact@v4
-        with:
-          name: locomotive-v3-rebuild
-          path: /tmp/locomotive-v3-rebuild
-      - name: Commit only byte-identical accepted asset files
-        env:
-          EXPECTED_HEAD: ${{ github.event.pull_request.head.sha }}
-        run: |
-          set -eu
-          branch=feature/stage-04b-linked-views
-          base=experiments/locomotive-v3
-          git fetch origin "$branch"
-          test "$(git rev-parse FETCH_HEAD)" = "$EXPECTED_HEAD" || { echo 'Branch changed; skipping preservation'; exit 0; }
-          while read -r expected name; do
-            file="/tmp/locomotive-v3-rebuild/$name"
-            test -f "$file" || continue
-            actual="$(sha256sum "$file" | cut -d' ' -f1)"
-            if test "$actual" = "$expected"; then
-              dest="$base/assets/$name"
-              if test -e "$dest"; then
-                test "$(sha256sum "$dest" | cut -d' ' -f1)" = "$expected" || { echo "Existing asset differs: $dest"; exit 1; }
-              else
-                mkdir -p "$(dirname "$dest")"
-                cp "$file" "$dest"
-                git add -- "$dest"
-              fi
-              echo "Exact accepted asset: $name"
-            else
-              echo "Hash differs; candidate stays in CI artifact: $name"
-            fi
-          done < "$base/accepted-assets.sha256"
-          if ! git diff --cached --quiet; then
-            git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'Archive byte-identical accepted locomotive V3 assets'
-            git push origin "HEAD:refs/heads/$branch"
-          fi

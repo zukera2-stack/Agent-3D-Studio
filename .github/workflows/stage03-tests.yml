@@ -3,9 +3,29 @@ name: A3DS Stage 03 Silhouette Fitting QA
 on:
   push:
     branches:
-      - feature/stage-03-silhouette-fitting
+      - 'feature/stage-03-silhouette-fitting'
+      - 'feature/stage-04b-linked-views'
+      - main
+    paths:
+      - 'a3ds/**'
+      - 'tests/**'
+      - '.github/workflows/stage*-*.yml'
+      - 'pyproject.toml'
+      - 'requirements*.txt'
   pull_request:
+    types: [opened, reopened, ready_for_review]
+    paths:
+      - 'a3ds/**'
+      - 'tests/**'
+      - '.github/workflows/stage*-*.yml'
+      - 'pyproject.toml'
+      - 'requirements*.txt'
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
 
 permissions:
   contents: read

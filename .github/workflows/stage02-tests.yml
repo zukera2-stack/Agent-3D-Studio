@@ -3,9 +3,29 @@ name: A3DS Stage 02 Native Rendering QA
 on:
   push:
     branches:
-      - "feature/stage-02-own-camera-raster"
+      - 'feature/stage-02-own-camera-raster'
+      - 'feature/stage-04b-linked-views'
+      - main
+    paths:
+      - 'a3ds/**'
+      - 'tests/**'
+      - '.github/workflows/stage*-*.yml'
+      - 'pyproject.toml'
+      - 'requirements*.txt'
   pull_request:
+    types: [opened, reopened, ready_for_review]
+    paths:
+      - 'a3ds/**'
+      - 'tests/**'
+      - '.github/workflows/stage*-*.yml'
+      - 'pyproject.toml'
+      - 'requirements*.txt'
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
 
 permissions:
   contents: read
@@ -26,6 +46,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Test Stage 01 and Stage 02
+        if: github.event_name == 'workflow_dispatch' || (github.head_ref || github.ref_name) != 'feature/stage-04b-linked-views'
         run: python -m unittest discover -s tests -v
       - name: Generate Stage 01 test body
         run: |

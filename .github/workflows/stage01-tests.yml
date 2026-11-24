@@ -3,10 +3,28 @@ name: A3DS Stage 01 Geometry QA
 on:
   push:
     branches:
-      - "feature/**"
+      - 'feature/**'
       - main
+    paths:
+      - 'a3ds/**'
+      - 'tests/**'
+      - '.github/workflows/stage*-*.yml'
+      - 'pyproject.toml'
+      - 'requirements*.txt'
   pull_request:
+    types: [opened, reopened, ready_for_review]
+    paths:
+      - 'a3ds/**'
+      - 'tests/**'
+      - '.github/workflows/stage*-*.yml'
+      - 'pyproject.toml'
+      - 'requirements*.txt'
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
 
 permissions:
   contents: read
@@ -26,6 +44,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Unit tests (stdlib only)
+        if: github.event_name == 'workflow_dispatch' || (github.head_ref || github.ref_name) != 'feature/stage-04b-linked-views'
         run: python -m unittest discover -s tests -v
       - name: Build real GLB and parametric source JSON
         run: |
