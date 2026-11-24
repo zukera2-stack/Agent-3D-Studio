@@ -1,42 +1,34 @@
 # Agent 3D Studio (A3DS)
 
-Stage 01: an original agent-oriented geometry kernel. Python 3.11+ standard library only. No dependency on Blender, external CAD frameworks, shader engines, image-to-3D weights or remote APIs.
+Original 3D geometry and reconstruction tools for an AI agent, written in Python 3.11+ and designed to run without Blender. Stages are developed in separate nonmerged Draft PRs.
 
-**Experimental geometry core, NOT a finished locomotive, universal CAD editor or production renderer.**
+- Stage 01: parametric surface mesh, topology, GLB2 export.
+- Stage 02: orthographic/perspective cameras, native CPU raster, Z-buffer, PNG, SVG coordinate grids.
+- Stage 03: measured 2D silhouette fitting via bounded modifications to the source project, multiple camera views, IoU loss, residual overlays and warnings.
 
-## Features
-- Explicit right-handed coordinates: X = width, +Y = front, Z = up, 1 workspace unit = 1 BU.
-- Vector arithmetic, transforms, normals and triangle-topology reports.
-- Smooth sampled superellipse loft from editable cross-sections; asymmetrical nose and rear.
-- Versioned parameter source in .a3ds.json.
-- Native glTF 2.0 GLB export with PBR base color and correct Y-up conversion.
-- A3DS Stage 01 subset GLB reader for roundtrip QA (not a general glTF importer).
-- Automated regression and negative tests in GitHub Actions.
+Important: this is an early experimental geometry tool. Stage 03 does NOT autonomously understand a complex colored sketch or guarantee unique 3D reconstruction.
 
-## Run
-No dependencies to install. From repository root:
+## Run original kernel/tests
 
     python -m unittest discover -s tests -v
-    python -m a3ds demo --out demo.glb --project demo.a3ds.json
-    python -m a3ds inspect --file demo.glb
-    python -m a3ds build --project demo.a3ds.json --out rebuilt.glb
 
-Demo GLB can be opened in compatible 3D viewers. It is a geometry test fixture, NOT an accepted game model.
+## Stage 03 self-contained synthetic test
 
-## Scope and safety
-Stage 01 does not implement silhouette fitting, UV/texturing, mesh self-intersection tests, rendering, Factorio sprites or game testing. See docs/ARCHITECTURE.md and docs/STAGE01_ACCEPTANCE.md.
+    python -m a3ds.stage03_cli fixture --out-dir refs --width 112 --height 84
+    python -m a3ds demo --out base.glb --project base.a3ds.json
+    python -m a3ds.stage03_cli fit --project base.a3ds.json --ref side=refs/side_reference.png --ref top=refs/top_reference.png --ref front=refs/front_reference.png --out-dir fitted --width 112 --height 84 --active width_scale height_scale nose_extension --min-iou 0.82
 
-All development on feature/stage-01-geometry-kernel via Draft PR. The new repository main was initialized with ONLY the initial README; no merge without owner permission. Factorio and user art remain untouched.
+The fitter receives only reference masks (NOT the synthetic truth parameters). The rear mask is withheld for an independent generalization check. Output: fitted.a3ds.json, fitted.glb, shaded PNG, fitted masks, red/blue difference PNG and fit_report.json with IoU per view.
 
-## Stage 02: native camera and image generator (experimental)
-The Stage 02 branch adds a pure-Python orthographic/perspective camera, near/far clipping, CPU Z-buffer renderer, deterministic PNG encoder, real-source silhouette masks, four one-way SVG grid sheets and explicit manual-landmark 2D registration.
+## Real source drawing workflow (MANUAL calibration)
+1. Select actual side/top/front orthographic views, calibrate pixel-per-BU, screen direction and registration. A perspective illustration is not automatically recognized as a true orthographic view.
+2. Optionally install Pillow ONLY for reading arbitrary external JPEG/PNG files: python -m pip install Pillow
+3. Produce a binary silhouette from an explicitly selected crop, e.g.:
 
-Run in repository root:
+    python -m a3ds.maskprep --input sketch.png --crop 10,40,800,600 --width 160 --height 120 --foreground dark --threshold 128 --out side_reference.png
 
-    python -m unittest discover -s tests -v
-    python -m a3ds demo --out stage01.glb --project stage01.a3ds.json
-    python -m a3ds.stage02_cli --glb stage01.glb --out-dir out/stage02 --width 480 --height 360
+4. Confirm reference image registration separately; cropping and resizing do not establish camera calibration.
+5. Run fit with calibrated masks and measure each view's residual. High residual cannot alone establish whether the drawing is inconsistent, the camera is wrong or this simple shape family is inadequate.
+6. Inspect GLB and final render against real sketch. Do not approve a model solely from IoU.
 
-The output folder contains four orthographic color PNG and 0.1 BU SVG grid sheets, a perspective hero PNG, five silhouette masks and report.json. All raster pixels come from the real 3D mesh. The Stage 01 original demo is a technical shape test; it is not approved game art.
-
-See docs/CAMERA_COORDINATES.md and docs/STAGE02_ACCEPTANCE.md. Stage 02 is a stacked Draft PR, not yet merged into main.
+See AGENTS.md, docs/STAGE03_ACCEPTANCE.md, docs/CURRENT_WORK.md. No Factorio mod changes and no main merges without owner approval.
