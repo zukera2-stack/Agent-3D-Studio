@@ -1,0 +1,107 @@
+name: A3DS Stage 03 Silhouette Fitting QA
+
+on:
+  push:
+    branches:
+      - feature/stage-03-silhouette-fitting
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  stage03:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install optional image adapter and independent QA decoder
+        run: python -m pip install Pillow==11.3.0
+      - name: Run Stage01 Stage02 Stage03 unit tests
+        run: python -m unittest discover -s tests -v
+      - name: Prepare synthetic calibrated silhouette references
+        run: |
+          mkdir -p artifacts
+          python -m a3ds.stage03_cli fixture --out-dir artifacts/references --width 112 --height 84
+          python -m a3ds demo --out artifacts/base.glb --project artifacts/base.a3ds.json
+      - name: Fit model from only masks, not ground-truth parameters
+        run: |
+          python -m a3ds.stage03_cli fit --project artifacts/base.a3ds.json \
+            --ref side=artifacts/references/side_reference.png \
+            --ref top=artifacts/references/top_reference.png \
+            --ref front=artifacts/references/front_reference.png \
+            --out-dir artifacts/fitted --width 112 --height 84 \
+            --active width_scale height_scale nose_extension \
+            --max-passes 12 --min-iou 0.82 > artifacts/fitting.log
+      - name: Independent metrics, GLB and held-out view
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          from PIL import Image
+          from a3ds.glb import read_glb
+          from a3ds.silhouette import BinaryMask, compare_masks
+          from a3ds.camera import standard_views
+          from a3ds.raster import render_silhouette
+          r = Path("artifacts")
+          report = json.loads((r / "fitted/fit_report.json").read_text())
+          assert report["final_loss"] < report["initial_loss"] - .025, report
+          assert report["status"] == "WITHIN_TOLERANCE", report["status"]
+          assert all(v["iou"] >= .82 for v in report["final_per_view"].values())
+          m = read_glb(r / "fitted/fitted.glb")
+          qa = m.validate(require_closed=True, require_outward=True)
+          assert qa.ok, qa.errors
+          cam = standard_views(112,84)["rear"]
+          predict = BinaryMask.from_render(render_silhouette(m, cam))
+          expected = BinaryMask.read_png(r / "references/rear_reference.png")
+          heldout = compare_masks(predict, expected)
+          assert heldout.iou >= .80, heldout
+          for name in ("side", "top", "front"):
+              for suffix in ("_fitted.png", "_fitted_mask.png", "_difference.png"):
+                  with Image.open(r / f"fitted/{name}{suffix}") as im:
+                      im.load()
+                      assert im.format == "PNG" and im.size == (112,84)
+          print("STAGE03 FIT PASS initial_loss=",report["initial_loss"],
+                "final_loss=",report["final_loss"],
+                "heldout_rear_iou=", heldout.iou,
+                "evals=",report["evaluations"])
+          PY
+      - name: Repeat fit and check byte-identical results
+        run: |
+          python -m a3ds.stage03_cli fit --project artifacts/base.a3ds.json \
+            --ref side=artifacts/references/side_reference.png \
+            --ref top=artifacts/references/top_reference.png \
+            --ref front=artifacts/references/front_reference.png \
+            --out-dir artifacts/repeat --width 112 --height 84 \
+            --active width_scale height_scale nose_extension \
+            --max-passes 12 --min-iou 0.82 > artifacts/repeat.log
+          python - <<'PY'
+          from pathlib import Path
+          a,b=Path("artifacts/fitted"),Path("artifacts/repeat")
+          names=sorted(p.name for p in a.iterdir() if p.is_file())
+          assert names==sorted(p.name for p in b.iterdir() if p.is_file())
+          for n in names:
+              assert (a/n).read_bytes()==(b/n).read_bytes(), n
+          print("STAGE03 REPRODUCIBLE",len(names),"files")
+          PY
+      - name: Upload synthetic fixture, fitted mesh, views and report
+        uses: actions/upload-artifact@v4
+        with:
+          name: a3ds-stage03-python-${{ matrix.python-version }}
+          path: |
+            artifacts/base.glb
+            artifacts/base.a3ds.json
+            artifacts/references/
+            artifacts/fitted/
+            artifacts/fitting.log
+          if-no-files-found: error
