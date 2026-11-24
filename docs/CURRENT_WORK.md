@@ -37,3 +37,10 @@ Owner instruction: STOP at Stage 04B; only verification and documentation, no St
 - Independent local environment: Python 3.13.5, Tk 8.6, Xvfb present. Attempted exact branch clone with GIT_TERMINAL_PROMPT=0; failed: Could not resolve host: github.com. No local source execution claimed.
 - Added QA-only tests/gui_stage04b_smoke.py and .github/workflows/stage04b-gui-qa.yml at 8dc284089884a5c9cdec06d3bb67e5ba67046d89. Actual Tk/Xvfb event smoke test is pending; no successful execution yet observed. Dialog paths mocked for isolated testing, not a native Windows or human acceptance test.
 - Remaining NOT_RUN: Windows GUI, independent visual inspection, overlay registration and transparency, arbitrary model framing, performance, actual owner locomotive sketch, game integration. Current GUI is a single-loft editor and redraws after release. No new modeling features authorized.
+
+
+### Verified GUI smoke results (2026-11-24)
+- QA-only HEAD 8dc284089884a5c9cdec06d3bb67e5ba67046d89: [run 45448681444](https://github.com/zukera2-stack/Agent-3D-Studio/actions/runs/45448681444), job 138639427686, SUCCESS. Actual log: GUI_SMOKE PASS: four canvases, mouse drag, save, undo/redo, GLB and orbit.
+- Documentation HEAD cc09a899abc6e9f43568178ef82259cbe25bffa8: [run 45448725021](https://github.com/zukera2-stack/Agent-3D-Studio/actions/runs/45448725021), job 138639593776, same PASS marker. [Full regression run 45448723301](https://github.com/zukera2-stack/Agent-3D-Studio/actions/runs/45448723301), jobs 138639584782 and 138639585084: 81/81 PASS on each Python 3.11/3.12, no skips.
+- Linux Xvfb automated Tk event exercise only; dialogs use mocked save paths. Does not prove native Windows GUI, visual correctness, interactive latency, overlay loading or alignment, actual model reference matching, or game integration. No independent local execution claimed.
+- Stage 04B remains frozen for QA; no Stage 05 or production code changes in this follow-up.
