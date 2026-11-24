@@ -20,3 +20,6 @@ See docs/QA_BARRAMUNDI_RGB_RECONSTRUCTION.md (99.1778% fresh-angle IoU, ~0.69 mm
 
 ## Reusable accepted V3 source
 For locomotive-style mechanical models, read experiments/locomotive-v3/README.md and baseline/qa.json, inspect the archived build.py and verify.py, and use the separate rebuild wrapper in an isolated directory. Do not change accepted V3 inputs or replace exact original GLBs with differing builds. Preserve roof-mounted components on the actual supporting surface and validate normals, closure where applicable, stable bounds and named moving parts after smoothing. V3 is a visual benchmark, not a general threshold or in-game approval.
+
+## Owner execution preference (2026-11-24)
+Bulk 3D and sprite rendering must run in the assistant's local computational environment when available; GitHub Actions is too slow for this workflow. Use GitHub for persistent source and documentation and the Factorio repository's required official install ZIP packaging, not routine rendering. If local execution is unavailable, report the blocker rather than silently switching to CI rendering.
