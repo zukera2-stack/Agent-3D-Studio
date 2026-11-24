@@ -1,0 +1,45 @@
+name: A3DS Stage 01 Geometry QA
+
+on:
+  push:
+    branches:
+      - "feature/**"
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  geometry:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - name: Checkout exact commit
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Unit tests (stdlib only)
+        run: python -m unittest discover -s tests -v
+      - name: Build real GLB and parametric source JSON
+        run: |
+          mkdir -p artifacts
+          python -m a3ds demo --out artifacts/stage01_test_body.glb --project artifacts/stage01_test_body.a3ds.json | tee artifacts/build.log
+      - name: Read GLB independently with CLI
+        run: python -m a3ds inspect --file artifacts/stage01_test_body.glb | tee artifacts/inspect.log
+      - name: Check deterministic binary output
+        run: |
+          python -m a3ds build --project artifacts/stage01_test_body.a3ds.json --out artifacts/rebuilt.glb
+          python -c "from pathlib import Path; a=Path('artifacts/stage01_test_body.glb').read_bytes(); b=Path('artifacts/rebuilt.glb').read_bytes(); assert a == b, 'Non-deterministic GLB'; print('GLB bytes reproducible:', len(a))"
+      - name: Archive reproducible test artifact (NOT a finished locomotive)
+        uses: actions/upload-artifact@v4
+        with:
+          name: a3ds-stage01-python-${{ matrix.python-version }}
+          path: artifacts/
+          if-no-files-found: error
