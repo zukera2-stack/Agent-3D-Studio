@@ -1,0 +1,13 @@
+name: Stage 04B GUI smoke QA
+on:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  tk-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install virtual display and system Tk
+        run: sudo apt-get update && sudo apt-get install -y xvfb xauth python3-tk
+      - name: Exercise actual GUI
+        run: PYTHONPATH=. xvfb-run -a /usr/bin/python3 tests/gui_stage04b_smoke.py
