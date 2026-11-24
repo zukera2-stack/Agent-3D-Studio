@@ -19,3 +19,14 @@ UVs/textures, multiple materials or scene nodes, smooth CAD BRep/NURBS, Boolean 
 
 ## Evidence
 Geometry tests and GLB rebuild are machine-checkable. Independent viewer rendering and game-native tests are separate gates. Check exact CI SHA before saying PASS.
+
+## Stage 02: original cameras, raster and sheet export
+- a3ds/camera.py: world-to-view basis and orthographic/perspective projection with near/far triangle clipping.
+- a3ds/raster.py: filled triangle CPU Z-buffer, flat Lambert shading, separate color and coverage mask.
+- a3ds/png.py: deterministic RGB8/grayscale8 PNG export with restricted internal reader.
+- a3ds/blueprint.py: SVG grids computed from canonical camera and world origin, embedded real PNG; one-way generated drawing.
+- a3ds/calibration.py: measured world-to-pixel scale+translation fit, RMS and inconsistency threshold. This does NOT reconstruct 3D from an artist sketch.
+- a3ds/stage02_cli.py: five camera views, ten PNG, four SVG and machine-readable report.
+- Stage 02 CI uses only stdlib in the application; Pillow is independently installed for test decoding in Actions.
+
+No production-ready antialiasing, global illumination, textures, UV, contour optimization, editor interactions or Factorio sprite export exists yet.
