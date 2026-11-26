@@ -1,0 +1,45 @@
+name: Locomotive V3 archive reproduction
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+jobs:
+  rebuild:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13.5'
+      - name: Install standalone experimental dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb xauth libgl1 libegl1 libgl1-mesa-dri
+          python -m pip install -r experiments/locomotive-v3/requirements.txt
+      - name: Rebuild and compare accepted asset hashes
+        working-directory: experiments/locomotive-v3
+        run: |
+          OPENBLAS_NUM_THREADS=2 LIBGL_ALWAYS_SOFTWARE=1 xvfb-run -a python loco_v3/build.py
+          python verify_rebuild.py
+          cat rebuild_hashes.json
+      - name: Retain rebuilt candidate and QA
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: locomotive-v3-rebuild
+          retention-days: 30
+          path: |
+            experiments/locomotive-v3/Locomotive_v3*.glb
+            experiments/locomotive-v3/loco_v3/*.png
+            experiments/locomotive-v3/loco_v3/metrics.json
+            experiments/locomotive-v3/loco_v3/qa.json
+            experiments/locomotive-v3/rebuild_hashes.json

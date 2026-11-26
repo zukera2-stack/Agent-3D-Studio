@@ -1,0 +1,96 @@
+{
+  "Locomotive_v3.glb": {
+    "meshes": 515,
+    "triangles": 233928,
+    "degenerate": 0,
+    "sha256": "931c9f0375c6f60f9314c9fec046c75b27ac811b4b0342f119a3fd91b377ce53",
+    "size_bytes": 3424064
+  },
+  "texture": [
+    4096,
+    2048
+  ],
+  "roof_support": [
+    {
+      "name": "roof_hatch_base-0.34_1.62",
+      "longitudinal_range_BU": [
+        1.4199999570846558,
+        1.8200000524520874
+      ],
+      "max_base_bottom_minus_roof_BU": -0.04469286524246341,
+      "samples": 25
+    },
+    {
+      "name": "roof_hatch_base-0.34_2.08",
+      "longitudinal_range_BU": [
+        1.8799999952316284,
+        2.2799999713897705
+      ],
+      "max_base_bottom_minus_roof_BU": -0.025706849791812036,
+      "samples": 25
+    },
+    {
+      "name": "roof_hatch_base0.34_1.62",
+      "longitudinal_range_BU": [
+        1.4199999570846558,
+        1.8200000524520874
+      ],
+      "max_base_bottom_minus_roof_BU": -0.04469320129529697,
+      "samples": 25
+    },
+    {
+      "name": "roof_hatch_base0.34_2.08",
+      "longitudinal_range_BU": [
+        1.8799999952316284,
+        2.2799999713897705
+      ],
+      "max_base_bottom_minus_roof_BU": -0.025707540318438138,
+      "samples": 25
+    }
+  ],
+  "hull_watertight": true,
+  "hull_winding_consistent": true,
+  "Locomotive_v3_body.glb": {
+    "meshes": 467,
+    "triangles": 219000,
+    "degenerate": 0,
+    "sha256": "6970a44dffaae84001b7c08bebac80083933982895461bb8f0b0c913bc566955",
+    "size_bytes": 3117740
+  },
+  "Locomotive_v3_pantograph.glb": {
+    "meshes": 48,
+    "triangles": 14928,
+    "degenerate": 0,
+    "sha256": "08b69acb1d61d48d3645d4ea8fe528944de7e8f62e512d458e15c59fbbfc2586",
+    "size_bytes": 311100
+  },
+  "hero_pixels": [
+    2400,
+    1600
+  ],
+  "side_pixels": [
+    2400,
+    1300
+  ],
+  "top_pixels": [
+    2400,
+    1300
+  ],
+  "front_pixels": [
+    1200,
+    1440
+  ],
+  "rear_pixels": [
+    1200,
+    1440
+  ],
+  "normal_primitive_count": 515,
+  "max_normal_unit_error": 5.960464477539063e-08,
+  "max_scene_bounds_delta_BU": 0.0,
+  "same_geometry_names": true,
+  "max_part_AABB_delta_BU": 0.0012726783752441406,
+  "hull_triangles_v2_v3": [
+    720,
+    29952
+  ]
+}

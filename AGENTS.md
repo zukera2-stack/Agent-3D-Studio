@@ -14,3 +14,6 @@ Repository rules:
 - Parameter search is bounded, logs all accepted moves and per-view loss, checks independent held-out views. No claim of unique physical 3D reconstruction from IoU.
 - Distinguish local Python execution, GitHub Actions pass, independent GLB/PNG checks, human visual inspection and Factorio in-game behavior.
 - Update docs with exact tested commit and logs. Do not claim success from source code alone.
+
+## Reference-to-model workflow (owner-approved direction)
+Before any reference-based modeling task, read [methodology](docs/REFERENCE_TO_MODEL_METHOD.md) and [agent skill](.agents/skills/a3ds-reference-to-model/SKILL.md). The two local experiments are evidence for a reusable procedure, not production integration. Preserve source, use actual geometry renders, compare iteratively, record errors and limitations, deliver editable source and validated GLB. Stage 04B remains frozen; no Stage 05, main merge, release or game edits without approval. The approved direction does not remove per-asset acceptance.

@@ -32,3 +32,23 @@ The fitter receives only reference masks (NOT the synthetic truth parameters). T
 6. Inspect GLB and final render against real sketch. Do not approve a model solely from IoU.
 
 See AGENTS.md, docs/STAGE03_ACCEPTANCE.md, docs/CURRENT_WORK.md. No Factorio mod changes and no main merges without owner approval.
+
+## Quick start for another AI agent — Stage 04B
+
+The default `main` branch is deliberately a bootstrap README only. The complete current tool source is in `feature/stage-04b-linked-views`. Clone that branch into a fresh writable directory:
+
+```sh
+git clone --branch feature/stage-04b-linked-views --single-branch https://github.com/zukera2-stack/Agent-3D-Studio.git
+cd Agent-3D-Studio
+python --version
+python -m unittest discover -s tests -v
+python -m a3ds demo --out smoke.glb --project smoke.a3ds.json
+python -m a3ds inspect --file smoke.glb
+python -m a3ds.stage02_cli --glb smoke.glb --out-dir smoke_views --width 360 --height 270 --grid 0.1
+```
+
+Use Python 3.11+ (historical CI verified 3.11 and 3.12). Optional Pillow enables external image import and additional QA; install with `python -m pip install Pillow==11.3.0` if needed. For the linked-view GUI, verify Tk with `python -m tkinter`, then run `python -m a3ds.linked_editor`. A headless agent can use the CLI and Python modules without the GUI. On Linux Tk and a display or Xvfb must be available for GUI execution. See [Stage 04B](docs/STAGE04B_LINKED_VIEWS.md).
+
+**This is source code, not an installed MCP server or remote execution service.** The agent needs its own working Python execution environment, repository access and permission to write outputs. The core is an experimental parametric loft editor with native rendering and calibrated silhouette fitting, not a general mesh editor. For complex assets consult [the modeling method](docs/REFERENCE_TO_MODEL_METHOD.md), [the agent skill](.agents/skills/a3ds-reference-to-model/SKILL.md), and [the actual archived locomotive V3 generator](experiments/locomotive-v3/README.md), which has separate dependencies and is not integrated into the core.
+
+If execution tools or repository access are absent, identify the exact missing capability; do not claim a successful build from reading the code alone. Perform actual smoke tests locally; no automatic GitHub rendering. Stage 04B remains frozen. No main changes, merges, new stage, or releases without owner approval.
